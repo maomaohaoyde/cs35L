@@ -1,0 +1,24 @@
+$ time -p ./srot13u </usr/local/cs/jdk1.8.0_31/jre/lib/rt.jar >output.txt
+Number of comparisons: 10260375
+real 66.69
+user 6.04
+sys 59.58
+
+time -p ./srot13 </usr/local/cs/jdk1.8.0_31/jre/lib/rt.jar >output.txt
+real 6.09
+user 3.81
+sys 1.20
+
+$ time -p ./srot13s </usr/local/cs/jdk1.8.0_31/jre/lib/rt.jar >output.txt
+real 57.24
+user 58.02
+sys 0.44
+
+srot13u spends the most real time and time on system call comparing with other two because it makes the most system calls.
+srot13s spends less real time than srot13u but still a lot more time than srot13 because it spends a lot of time on user mode function calls.
+srot13 is the fastest because it makes the least system calls and functions calls.
+
+number of lines 9, number of comparisons 16
+number of lines 32, number of comparisons 97
+number of lines 250, number of comparisons 1407
+number of comparisons = number of lines * natural log of number of lines

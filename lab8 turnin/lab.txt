@@ -1,0 +1,98 @@
+$ gcc tr2b.c -o tr2b
+$ gcc tr2u.c -o tr2u
+compile two tr files
+
+$ head —bytes=5000000 /dev/urandom > random.txt
+generate a file of 5000000 bytes
+
+$ strace -c ./tr2b "" "" <random.txt >output.txt
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 87.50    0.000084           1        77           write
+  12.50    0.000012           1        10           mmap
+    0.00    0.000000           0        79           read
+      0.00    0.000000           0         2           open
+        0.00    0.000000           0         2           close
+	  0.00    0.000000           0         4           fstat
+	    0.00    0.000000           0         3           mprotect
+	      0.00    0.000000           0         1           munmap
+	        0.00    0.000000           0         1           brk
+		  0.00    0.000000           0         1         1 access
+		    0.00    0.000000           0         1           execve
+		      0.00    0.000000           0         1           arch_prctl
+		      ------ ----------- ----------- --------- --------- ----------------
+		      100.00    0.000096                   182         1 total
+
+
+$ strace -c ./tr2u "" "" <random.txt >output.txt
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 58.02    0.805059           0   5000000           write
+  41.98    0.582560           0   5000002           read
+    0.00    0.000000           0         2           open
+      0.00    0.000000           0         2           close
+        0.00    0.000000           0         2           fstat
+	  0.00    0.000000           0         8           mmap
+	    0.00    0.000000           0         3           mprotect
+	      0.00    0.000000           0         1           munmap
+	        0.00    0.000000           0         1           brk
+		  0.00    0.000000           0         1         1 access
+		    0.00    0.000000           0         1           execve
+		      0.00    0.000000           0         1           arch_prctl
+		      ------ ----------- ----------- --------- --------- ----------------
+		      100.00    1.387619              10000024         1 total
+
+When copying one file to another, tr2b only makes about 80 calls in each of reading and writing process, whereas tr2u makes one system call for every reading and writing process.
+
+$ strace -c ./tr2b "" "" <random.txt
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 97.51    0.001450           0     19759           write
+   2.49    0.000037           0        79           read
+     0.00    0.000000           0         2           open
+       0.00    0.000000           0         2           close
+         0.00    0.000000           0         4           fstat
+	   0.00    0.000000           0        10           mmap
+	     0.00    0.000000           0         3           mprotect
+	       0.00    0.000000           0         1           munmap
+	         0.00    0.000000           0         1           brk
+		   0.00    0.000000           0         1         1 access
+		     0.00    0.000000           0         1           execve
+		       0.00    0.000000           0         1           arch_prctl
+		       ------ ----------- ----------- --------- --------- ----------------
+		       100.00    0.001487                 19864         1 total
+		       When copying one file to my terminal, tr2b takes about the same amount to read the file but about 20000 calls to write it to the terminal.
+		       Terminal might only allow certain bytes to be copied over at one time. So it takes more system calls.
+
+$ strace -c ./tr2u "" "" <random.txt
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 56.92    0.426245           0   5000000           write
+  43.08    0.322603           0   5000002           read
+    0.00    0.000016           2         8           mmap
+      0.00    0.000000           0         2           open
+        0.00    0.000000           0         2           close
+	  0.00    0.000000           0         2           fstat
+	    0.00    0.000000           0         3           mprotect
+	      0.00    0.000000           0         1           munmap
+	        0.00    0.000000           0         1           brk
+		  0.00    0.000000           0         1         1 access
+		    0.00    0.000000           0         1           execve
+		      0.00    0.000000           0         1           arch_prctl
+		      ------ ----------- ----------- --------- --------- ----------------
+		      100.00    0.748864              10000024         1 total
+		      tr2u has the similar performance when copying one file to the terminal as copying one file to another.
+
+$ time -p ./tr2b "" "" <random.txt >/dev/null
+real 0.18
+user 0.17
+sys 0.00
+
+$ time -p ./tr2u "" "" <random.txt >/dev/null
+real 2.42
+user 0.35
+sys 2.06
+
+tr2b only takes about one fifth of a second to copy 5000000 bytes of data while tr2u takes about two and half seconds.
+Besides the huge difference in real time used, about two seconds are used on system calls by tr2u. But the time tribe used on system calls are negligible.
+The difference in the real time is caused by the difference number of the system calls.
