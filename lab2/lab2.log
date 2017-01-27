@@ -1,0 +1,41 @@
+1;2cCommand 1: sort words
+
+Command 2: wget http://cs.ucla.edu/classes/spring15/cs35L/assign/assign2.html
+The webpage is saved in assign2.html
+
+Command 3: cat assign2.html | tr -c 'A-Za-z' '[\n*]'
+Explanation: replace all the non-alphabetic characters with new lines
+
+Command 4: cat assign2.html | tr -cs 'A-Za-z' '[\n*]'
+Explanation: replace all the non-alphabetic characters with new lines, only keep one new line if repeated
+
+Command 5: cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort
+Explanation: replace all the non-alphabetic characters with new lines, only keep one new line if repeated and sort the result
+
+Command 6: cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u
+Explanation: replace all the non-alphabetic characters with new lines, only keep one new line if repeated and sort the result, only keep one instance for each distinct case
+
+Command 7: cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm - words
+Explanation: replace all the non-alphabetic characters with new lines, only keep one new line if repeated and sort the result, only keep one instance for each distinct case. List all the distinct cases in assign2.html and words.
+
+Command 8: cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm —23 words
+Explanation： replace all the non-alphabetic characters with new lines, only keep one new line if repeated and sort the result, only keep one instance for each distinct case in assign2.html.
+
+Command 9: emacs buildwords
+Write Buildwords
+
+Command 10: cat hwnwdseng.htm | ./buildwords | less >hwords
+put hawaiian words into hwords
+
+Command 11: cat assign2.html | sed 's/<[^>]*>//g' | tr 'A-Z' 'a-z' |tr -d '\r' | tr -cs "^[pk'mnwlhaeiou]*$" '[\n*]' | sort -u | comm -23 - hwords | wc -l  
+Explanation: open the html file, remove the html tags, convert all upper case letters to lower case letters, remove carriage returns. Keep only words that contain only Hawaiian characters, sort it with each distinct case and compare with Hawaiian dictionary, find the distinct “Hawaiian” words appear in html file.
+Misspelled Hawaiian words: 192
+Examples: un who uni whi...
+
+Command 12: cat assign2.html | sed 's/<[^>]*>//g' | tr 'A-Z' 'a-z' |tr -d '\r' | tr -cs 'a-z' '[\n*]' | sort -u | comm -23 - words | wc -l
+Explanation: open the html file, remove the html tags, convert all upper case letters to lower case letters, remove carriage returns. Keep only words that contain letters from a to z, ort it with each distinct case and compare with English dictionary, find the distinct “English” words appear in html file.
+Misspelled English words: 26
+Examples: sameln wiki wikipedia wget...
+ 
+Command 13: emacs sameln
+Write sameln
