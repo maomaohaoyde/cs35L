@@ -1,0 +1,30 @@
+export PATH=/usr/local/cs/bin:$PATH
+Add /usr/local/cs/bin to PATH
+
+$ od -An -f -N 40000000 < /dev/urandom | tr -s ‘ ’ ‘\n’ >random.txt
+-An: set output format to none.
+-f t: set output to be double-precision floating point.
+40000000: to generate 10M numbers each of size 4 bytes, we need 40000000 bytes.
+tr -s ‘ ’ ‘\n’:change all the spaces to newlines and remove duplicate new lines
+
+$ time -p /usr/local/cs/bin/sort -g --parallel=1 random.txt > /dev/null
+real 86.19
+user 86.08
+sys 0.11
+
+$ time -p /usr/local/cs/bin/sort -g --parallel=2 random.txt > /dev/null
+real 45.64
+user 86.74
+sys 0.12
+
+$ time -p /usr/local/cs/bin/sort -g --parallel=4 random.txt > /dev/null
+real 25.42
+user 86.79
+sys 0.18
+
+$ time -p /usr/local/cs/bin/sort -g --parallel=8 random.txt > /dev/null
+real 16.35
+user 90.71
+sys 0.19
+
+Comparing the real time, sort function get faster when there are more threads.
