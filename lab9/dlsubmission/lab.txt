@@ -1,0 +1,84 @@
+$ emacs HelloWorld.c
+write an simple helloworld function
+
+$ gcc HelloWorld.c -o helloworld
+compile the helloworld function, creating an executable
+
+$ ./helloworld
+hello, world
+run the executable
+
+ldd helloworld
+    linux-vdso.so.1 =>  (0x00007ffffc5ff000)
+    		    libc.so.6 => /lib64/libc.so.6 (0x000000318cc00000)
+		    	      /lib64/ld-linux-x86-64.so.2 (0x000000318c800000)
+			      see which library this function uses
+
+$ strace -c ./helloworld
+hello, world% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000032          11         3           mprotect
+  0.00    0.000000           0         1           read
+    0.00    0.000000           0         1           write
+      0.00    0.000000           0         2           open
+        0.00    0.000000           0         2           close
+	  0.00    0.000000           0         3           fstat
+	    0.00    0.000000           0         9           mmap
+	      0.00    0.000000           0         1           munmap
+	        0.00    0.000000           0         1           brk
+		  0.00    0.000000           0         1         1 access
+		    0.00    0.000000           0         1           execve
+		      0.00    0.000000           0         1           arch_prctl
+		      ------ ----------- ----------- --------- --------- ------
+		      ----------
+		      100.00    0.000032                    26         1 total
+		      use strace to check which systems this function makes
+
+open, close, read and write are related to dynamic linking, because the functio
+n is linked to stdio.h which is a library contains functions for inputs and out
+puts
+
+ls /usr/bin | awk ‘NR%101==604439206%101'
+random select and print out some commands
+
+list of commands:
+anthy-morphological-analyzer
+bzr
+cpanp-run-perl
+dcopobject
+erb
+floppy
+git-upload-pack
+gpgv
+gvfs-open
+hwloc-distrib
+jv-convert
+kmail_clamav.sh
+lesspipe.sh
+makealias
+msgcmp
+nm-tool
+pamedge
+pbmtoascii
+pgmnorm
+pngtopam
+ppmpat
+pygobject-codegen-2.0
+report-gtk
+sclient
+smp_conf_general
+synclient
+truncate
+wmf2eps
+Xorg
+
+Run ldd on each of the command,appending the result to one file:
+$ ldd /usr/bin/command >>lab9.txt
+some of the files are not dynamic executable
+
+$ cat lab9.txt | tr -d '^(0x.*)$' >lab.txt
+get rid of the numbers in the parenthesis so that only libraries are sorted and
+duplicates are eliminated.
+
+$ sort -u lab.txt >lab9.txt
+sort the file
