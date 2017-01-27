@@ -1,0 +1,11 @@
+Q1. Why did Brady's patch remove the line "case_long_iso_time_style:"? Was it necessary to remove that line? Explain.
+Brady removed this line because the line of code that calls this line is deleted, this line is useless. It was not necessary to remove this line since it has no effect on the result. But since it is useless, it won’t hurt if this line is removed.
+
+Q2. If your company adopts this patched version of Coreutils instead of the default one, what else should you watch out for? Might this new version of Coreutils introduce other problems with your application, perhaps in countries where users don't speak English and don't understand English-format dates?
+Perhaps in countries where users don’t speak English, People may not recognize the abbreviation of the month, although days and years will be understood. To solve this problem, a helper text that explains the meaning of the months might be added.
+
+Q3. What happens when this script is invoked on an empty file like /dev/null, and why?
+When I used the script on /dev/null it reported error “list index out of range” and this is because /dev/null is an empty file in which there is no line to choose. The list will have size 0, attempts to access any member of list will be “out of range.”
+
+Q4. What happens when this script is invoked with Python 3 rather than Python 2, and why?
+It reports a syntax error. Because tuple parameter unpacking feature is in Python 2 but removed in Python 3.

@@ -1,0 +1,64 @@
+wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+I used wget to download the software
+
+tar -xzvf ~/coreutils-7.6.tar.gz
+I used command tar to decompress the file I downloaded
+
+mkdir coreutilsInstall 
+the directory "coreutilsInstall" did not already exist, so I used mkdir to create it to install the software under this directory
+
+pwd
+pwd prints out current directory. I used it to see the absolute directory of the directory I just created
+
+ls
+ls lists information about the files starting in the current directory. I used this because I wanted to know if the directory "coreutils-7.6" existed
+
+cd coreutils-7.6
+cd changes the current directory. So I used it to enter coreutils-7.6  to install software
+
+cat INSTALL | less
+I read the instruction in INSTALL
+
+./configure —prefix=/u/eng/class/classong/coreutilsInstall
+If I don’t change the directory, the software will be automatically installed into bin which I do not have access to. So I change the prefix to the directory I just created.
+
+make
+make efficiently compiles files and keeps them up-to-date. I use it to compile all the program code and creates executables in current temporary directory
+
+make install
+make install makes utility searches for a label named install within the Makefile, and executes only that section of it. I used it to install the software under coreutilsInstall directory
+
+
+find -name ls
+Find -name help me find the files that contains the keyword and print out their directory. I used it to find where ls is written.
+
+cd ./src
+I changed the directory to which ls file belongs to
+
+./ls -l
+I ran the local ls to see the time format
+
+cd coreutils-7.6
+cd changes the current directory. So I used it to enter coreutils-7.6  to patch ls
+
+man patch
+man shows the man page of certain commands. I used it to understand pnum for patch command 
+
+emacs patch_file
+copy text into the file from the line —-- a/src/ls to the end line —-
+
+patch -p1 <patch_file
+patch applies the diff file. I used it to apply the modified version
+
+make
+compile the new version
+
+cd ~
+go back to home directory
+
+touch –t 201309090909.0909 test_file
+change the modified time of the test_file
+
+/u/eng/class/classong/coreutils-7.6/src/ls -l
+/u/eng/class/classong/coreutilsInstall/bin
+see the if modification works
