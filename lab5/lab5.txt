@@ -1,0 +1,103 @@
+$ wget http://cs.ucla.edu/classes/spring15/cs35L/assign/coreutils-with-bug.tar.gz
+download the file
+
+$ tar -xzvf coreutils-with-bug.tar.gz
+Decompress file in current directory
+
+$ cd coreutils-with-bug
+open the decompressed file
+
+$ ./configure CFLAGS=“-g -O0”
+configure, turning off the optimization
+
+$ make
+run the source files, failed
+
+$ wget http://cs.ucla.edu/classes/spring15/cs35L/assign/coreutils.diff
+download the patch file
+
+$ patch -p0 <coreutils.diff
+apply the patch
+
+$ ./configure CFLAGS=“-g -O0”
+$ make
+configure and run again, this time succeed, getting executables.
+
+What problems did you have when building it as-is, and why did the renaming patch fix them?
+The function futimens already exists. The redefinition of the function causes the bug. The patch file rename the new function to avoid that.
+
+$ tmp=$(mktemp -d)
+create a directory
+$ cd $tmp
+$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+manually modify the time
+$ touch now
+$ sleep 1
+$ touch now1
+create two other files
+$ TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+-rw-r--r-- 1 classong class 0 1918-11-11 08:00:00.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 classong class 0 2015-05-02 21:40:21.481344099 +0000 now1
+-rw-r--r-- 1 classong class 0 2015-05-02 21:40:15.141115601 +0000 now
+reproduce the problem, the file dated 1918 shouldn’t be the first one
+
+$ gdb ~/coreutils-with-bug/src/ls
+open gdb to debug ls executable
+
+(gdb) info functions
+see the functions in the program
+(gdb) break compare_mtime
+find the one may related to time, create a breakpoint
+
+(gdb) run -lt --full-time wwi-armistice now now1
+run till the breakpoint stops it
+
+(gdb) list
+(gdb) step
+use these two commands to look up the next lines
+find inconsistency of code with comment at ../lib/timespec.h:48
+
+$ cd ~/coreutils-with-bug/lib
+$ emacs timespec.h
+$ ./configure CFLAGS=“-g -O0”
+$ make
+$ cd $tmp
+$ TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+  try to fix the bug, testing on it.
+
+$ cp timespec.h lab5.h
+$ emacs lab5.h
+recover timespec.h, get a copy of it and fix the bug in that copy
+record this debugging using
+C-x 4 a
+
+$ emacs ../lab5.diff
+copy the recording in the log to a new diff file
+
+$ diff -u timespec.h lab5.h >>../lab5.diff
+append the change to the diff file
+
+
+$ cd
+$ rm -fr $tmp
+delete the directory created for testing ls
+
+Also, try to reproduce the problem in your home directory on the SEASnet Linux
+servers, instead of using the $tmp directory. When running the above test case,
+use the already-installed touch and ls utilities instead of the old version of
+coreutils. How well does SEASnet do?
+$ cd ~
+$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+$ touch now
+$ sleep 1
+$ touch now1
+$ TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+-rw-r--r-- 1 classong class 0 2054-12-17 17:28:16.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 classong class 0 2015-05-05 05:07:33.738394000 +0000 now1
+-rw-r--r-- 1 classong class 0 2015-05-05 05:07:32.734030000 +0000 now
+
+Reproducing the problem in the home directory gives a time in the future.
+The reason for this is SEASnet NFS filesystem has unsigned 32-bit time stamps,
+whereas Local File System on Linux server has signed 32-bit time stamps.
+Timestamps are stored as number of milliseconds since Unix Epoch: 01/01/1970 12:00AM.
+So in the SEASnet filesystem, the negative number of milliseconds is interpreted as unsigned number, rendering a time in the future.
